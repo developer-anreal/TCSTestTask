@@ -2,7 +2,7 @@
 //  Partner.m
 //  TKSTestTask
 //
-//  Created by Anton Serov on 3/13/15.
+//  Created by Anton Serov on 13/03/15.
 //  Copyright (c) 2015 hexforge. All rights reserved.
 //
 
@@ -13,13 +13,13 @@
 
 @implementation Partner
 
-@dynamic partnerId;
+@dynamic moneyMax;
+@dynamic moneyMin;
 @dynamic name;
+@dynamic partnerDescription;
+@dynamic partnerId;
 @dynamic picture;
 @dynamic url;
-@dynamic partenrDescription;
-@dynamic moneyMin;
-@dynamic moneyMax;
 @dynamic pointType;
 @dynamic spots;
 

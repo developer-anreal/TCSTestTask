@@ -31,9 +31,9 @@
         }
         NSManagedObjectContext *moc = strongSelf.mainManagedObjectContext;
         if (note.object != moc) {
-          [moc performBlock:^(){
+          dispatch_async(dispatch_get_main_queue(), ^{
             [moc mergeChangesFromContextDidSaveNotification:note];
-          }];
+          });
         }
       }];
   }

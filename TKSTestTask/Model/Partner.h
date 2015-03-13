@@ -2,7 +2,7 @@
 //  Partner.h
 //  TKSTestTask
 //
-//  Created by Anton Serov on 3/13/15.
+//  Created by Anton Serov on 13/03/15.
 //  Copyright (c) 2015 hexforge. All rights reserved.
 //
 
@@ -13,13 +13,13 @@
 
 @interface Partner : NSManagedObject
 
-@property (nonatomic, retain) NSString * partnerId;
+@property (nonatomic, retain) NSNumber * moneyMax;
+@property (nonatomic, retain) NSNumber * moneyMin;
 @property (nonatomic, retain) NSString * name;
+@property (nonatomic, retain) NSString * partnerDescription;
+@property (nonatomic, retain) NSString * partnerId;
 @property (nonatomic, retain) NSData * picture;
 @property (nonatomic, retain) NSString * url;
-@property (nonatomic, retain) NSString * partenrDescription;
-@property (nonatomic, retain) NSNumber * moneyMin;
-@property (nonatomic, retain) NSNumber * moneyMax;
 @property (nonatomic, retain) PointType *pointType;
 @property (nonatomic, retain) NSSet *spots;
 @end

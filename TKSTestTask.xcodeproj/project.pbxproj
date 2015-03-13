@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1931B4A3BCA2E64D63463B78 /* PartnersRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1931BE3C70EB9F9B38417C2B /* PartnersRequest.m */; };
+		3B8DEEE11AB2E6E400EE7BB5 /* Partner+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8DEEE01AB2E6E400EE7BB5 /* Partner+Addition.m */; };
+		3B8DEEE41AB2E88D00EE7BB5 /* Partner.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8DEEE31AB2E88D00EE7BB5 /* Partner.m */; };
+		3B8DEEE71AB305C000EE7BB5 /* NSManagedObject+Custom.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B8DEEE61AB305C000EE7BB5 /* NSManagedObject+Custom.m */; };
 		DBC197791AB203730036AE39 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DBC197781AB203730036AE39 /* main.m */; };
 		DBC1977C1AB203730036AE39 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DBC1977B1AB203730036AE39 /* AppDelegate.m */; };
 		DBC1977F1AB203730036AE39 /* TKSTestTask.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = DBC1977D1AB203730036AE39 /* TKSTestTask.xcdatamodeld */; };
@@ -19,7 +22,6 @@
 		DBC197A01AB21C640036AE39 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBC1979F1AB21C630036AE39 /* MapKit.framework */; };
 		DBF351FA1AB2B6E20088F8E6 /* PointType.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF351F91AB2B6E20088F8E6 /* PointType.m */; };
 		DBF351FD1AB2B6E30088F8E6 /* PartnerSpot.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF351FC1AB2B6E30088F8E6 /* PartnerSpot.m */; };
-		DBF352031AB2B74E0088F8E6 /* Partner.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF352021AB2B74E0088F8E6 /* Partner.m */; };
 		DBF352081AB2BFE70088F8E6 /* PartnersRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF352071AB2BFE70088F8E6 /* PartnersRequestOperation.m */; };
 		DBF3520B1AB2C0750088F8E6 /* PartnersStore.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF3520A1AB2C0750088F8E6 /* PartnersStore.m */; };
 /* End PBXBuildFile section */
@@ -37,6 +39,12 @@
 /* Begin PBXFileReference section */
 		1931B1874AA473C7B7ABAE3A /* PartnersRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PartnersRequest.h; sourceTree = "<group>"; };
 		1931BE3C70EB9F9B38417C2B /* PartnersRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PartnersRequest.m; sourceTree = "<group>"; };
+		3B8DEEDF1AB2E6E400EE7BB5 /* Partner+Addition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Partner+Addition.h"; sourceTree = "<group>"; };
+		3B8DEEE01AB2E6E400EE7BB5 /* Partner+Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Partner+Addition.m"; sourceTree = "<group>"; };
+		3B8DEEE21AB2E88D00EE7BB5 /* Partner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Partner.h; sourceTree = "<group>"; };
+		3B8DEEE31AB2E88D00EE7BB5 /* Partner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Partner.m; sourceTree = "<group>"; };
+		3B8DEEE51AB305C000EE7BB5 /* NSManagedObject+Custom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObject+Custom.h"; sourceTree = "<group>"; };
+		3B8DEEE61AB305C000EE7BB5 /* NSManagedObject+Custom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+Custom.m"; sourceTree = "<group>"; };
 		DBC197731AB203730036AE39 /* TKSTestTask.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TKSTestTask.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBC197771AB203730036AE39 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBC197781AB203730036AE39 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -56,8 +64,6 @@
 		DBF351F91AB2B6E20088F8E6 /* PointType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PointType.m; sourceTree = "<group>"; };
 		DBF351FB1AB2B6E30088F8E6 /* PartnerSpot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PartnerSpot.h; sourceTree = "<group>"; };
 		DBF351FC1AB2B6E30088F8E6 /* PartnerSpot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PartnerSpot.m; sourceTree = "<group>"; };
-		DBF352011AB2B74E0088F8E6 /* Partner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Partner.h; sourceTree = "<group>"; };
-		DBF352021AB2B74E0088F8E6 /* Partner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Partner.m; sourceTree = "<group>"; };
 		DBF352061AB2BFE70088F8E6 /* PartnersRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PartnersRequestOperation.h; sourceTree = "<group>"; };
 		DBF352071AB2BFE70088F8E6 /* PartnersRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PartnersRequestOperation.m; sourceTree = "<group>"; };
 		DBF352091AB2C0750088F8E6 /* PartnersStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PartnersStore.h; sourceTree = "<group>"; };
@@ -86,8 +92,8 @@
 		1931B0208BD0A9921E3C8CE0 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				DBF352011AB2B74E0088F8E6 /* Partner.h */,
-				DBF352021AB2B74E0088F8E6 /* Partner.m */,
+				3B8DEEE21AB2E88D00EE7BB5 /* Partner.h */,
+				3B8DEEE31AB2E88D00EE7BB5 /* Partner.m */,
 				DBF351FB1AB2B6E30088F8E6 /* PartnerSpot.h */,
 				DBF351FC1AB2B6E30088F8E6 /* PartnerSpot.m */,
 				DBF351F81AB2B6E20088F8E6 /* PointType.h */,
@@ -98,6 +104,10 @@
 				DBF352071AB2BFE70088F8E6 /* PartnersRequestOperation.m */,
 				DBF352091AB2C0750088F8E6 /* PartnersStore.h */,
 				DBF3520A1AB2C0750088F8E6 /* PartnersStore.m */,
+				3B8DEEDF1AB2E6E400EE7BB5 /* Partner+Addition.h */,
+				3B8DEEE01AB2E6E400EE7BB5 /* Partner+Addition.m */,
+				3B8DEEE51AB305C000EE7BB5 /* NSManagedObject+Custom.h */,
+				3B8DEEE61AB305C000EE7BB5 /* NSManagedObject+Custom.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -264,11 +274,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B8DEEE41AB2E88D00EE7BB5 /* Partner.m in Sources */,
 				DBF3520B1AB2C0750088F8E6 /* PartnersStore.m in Sources */,
-				DBF352031AB2B74E0088F8E6 /* Partner.m in Sources */,
+				3B8DEEE71AB305C000EE7BB5 /* NSManagedObject+Custom.m in Sources */,
 				DBF352081AB2BFE70088F8E6 /* PartnersRequestOperation.m in Sources */,
 				DBC1977F1AB203730036AE39 /* TKSTestTask.xcdatamodeld in Sources */,
 				DBC1977C1AB203730036AE39 /* AppDelegate.m in Sources */,
+				3B8DEEE11AB2E6E400EE7BB5 /* Partner+Addition.m in Sources */,
 				DBF351FA1AB2B6E20088F8E6 /* PointType.m in Sources */,
 				DBC197821AB203730036AE39 /* PartnersViewController.m in Sources */,
 				DBC197791AB203730036AE39 /* main.m in Sources */,
@@ -398,8 +410,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = TKSTestTask/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -408,8 +422,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = TKSTestTask/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

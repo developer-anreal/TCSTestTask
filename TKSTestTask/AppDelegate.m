@@ -10,7 +10,6 @@
 #import "PartnersStore.h"
 
 @interface AppDelegate ()
-@property (nonatomic, strong) PartnersStore *store;
 @end
 
 @implementation AppDelegate
@@ -42,7 +41,6 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     // Saves changes in the application's managed object context before the application terminates.
-    [self.store saveContext];
 }
 
 @end
