@@ -69,7 +69,6 @@
   <MKMapViewDelegate, CLLocationManagerDelegate, NSFetchedResultsControllerDelegate>
 
 @property (weak) IBOutlet MKMapView *map;
-@property (weak) IBOutlet UIView *searchInfoView;
 @property (nonatomic, strong, readonly) NSFetchedResultsController *spots;
 @end
 
@@ -114,15 +113,6 @@
   
   self.navigationItem.leftBarButtonItem =
     [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.map];
-  
-  CGRect rect = self.searchInfoView.frame;
-  self.searchInfoView.frame =
-    CGRectMake(
-      CGRectGetMinX(rect),
-      CGRectGetMinY(rect) + CGRectGetHeight(rect),
-      CGRectGetWidth(rect),
-      CGRectGetHeight(rect)
-  );
   
   _displayedAnnotations = [NSMutableDictionary dictionary];
   
@@ -213,33 +203,14 @@
   if (_loadPartnersOperation.executing || _loadPartnersOperation.ready) {
     [_loadSpotsOperation addDependency:_loadPartnersOperation];
   }
-  __weak typeof(self) weakSelf = self;
+  
   _loadSpotsOperation.completionBlock = ^{
     dispatch_async(dispatch_get_main_queue(), ^{
-      [UIView animateWithDuration:0.3f animations:^{
-        CGRect rect = weakSelf.searchInfoView.frame;
-        weakSelf.searchInfoView.frame =
-          CGRectMake(
-            CGRectGetMinX(rect),
-            CGRectGetMinY(rect) + CGRectGetHeight(rect),
-            CGRectGetWidth(rect),
-            CGRectGetHeight(rect)
-          );
-      } completion:^(BOOL finished) {
-      }];
+      [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     });
   };
-  [UIView animateWithDuration:0.3f animations:^{
-    CGRect rect = weakSelf.searchInfoView.frame;
-    weakSelf.searchInfoView.frame =
-    CGRectMake(
-      CGRectGetMinX(rect),
-      CGRectGetMinY(rect) - CGRectGetHeight(rect),
-      CGRectGetWidth(rect),
-      CGRectGetHeight(rect)
-    );
-  } completion:^(BOOL finished) {
-  }];
+  
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   [_operationQueue addOperation:_loadSpotsOperation];
 }
 
