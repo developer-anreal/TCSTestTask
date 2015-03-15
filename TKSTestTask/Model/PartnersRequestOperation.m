@@ -147,7 +147,6 @@ NSString * const kPartnersURL = @"https://api.tcsbank.ru/v1/deposition_partners?
   if (self.isCancelled) {
     [self.context rollback];
   } else {
-    NSLog(@"%@", self.requestURL);
     [self.context performBlock:^{
       NSError *saveError = nil;
       [self.context save:&saveError];

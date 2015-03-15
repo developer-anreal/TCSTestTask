@@ -109,6 +109,9 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  self.navigationItem.leftBarButtonItem =
+    [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.map];;
+  
   _displayedAnnotations = [NSMutableDictionary dictionary];
   
   _partnersStore = [PartnersStore sharedInstance];
@@ -124,6 +127,24 @@
   if ([_locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
     [_locationManager requestWhenInUseAuthorization];
   }
+}
+
+- (IBAction)zoomIn:(id)sender {
+  MKCoordinateRegion region = self.map.region;
+  MKCoordinateSpan span;
+  span.latitudeDelta = region.span.latitudeDelta / 2.;
+  span.longitudeDelta = region.span.longitudeDelta / 2.;
+  region.span = span;
+  [self.map setRegion:region animated:YES];
+}
+
+- (IBAction)zoomOut:(id)sender {
+  MKCoordinateRegion region = self.map.region;
+  MKCoordinateSpan span;
+  span.latitudeDelta = region.span.latitudeDelta * 2;
+  span.longitudeDelta = region.span.longitudeDelta * 2;
+  region.span = span;
+  [self.map setRegion:region animated:YES];
 }
 
 - (void)reloadFetchRequest {

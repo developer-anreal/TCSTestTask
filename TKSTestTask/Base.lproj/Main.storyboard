@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="gTz-u7-1gD">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="6vI-gB-HXJ">
+            <objects>
+                <navigationController id="gTz-u7-1gD" sceneMemberID="viewController">
+                    <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="HtO-7S-fDB">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="Pdp-CQ-JwO"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="htA-ab-qFV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-521" y="327"/>
+        </scene>
         <!--Partners View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -22,15 +40,48 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="vaW-Dj-GX7"/>
                                 </connections>
                             </mapView>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="r7c-0v-zgc">
+                                <rect key="frame" x="0.0" y="570" width="600" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="f4b-Bk-iRm"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="top" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2a2-rF-2SP">
+                                <rect key="frame" x="16" y="489" width="30" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="23"/>
+                                <state key="normal" title="+"/>
+                                <connections>
+                                    <action selector="zoomIn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="CqH-ef-Abw"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="top" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RT7-5L-jgq">
+                                <rect key="frame" x="16" y="532" width="30" height="30"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="23"/>
+                                <state key="normal" title="-"/>
+                                <connections>
+                                    <action selector="zoomOut:" destination="BYZ-38-t0r" eventType="touchUpInside" id="eYP-Rx-lkS"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="r7c-0v-zgc" firstAttribute="top" secondItem="RT7-5L-jgq" secondAttribute="bottom" constant="8" id="D37-ve-PTl"/>
+                            <constraint firstItem="RT7-5L-jgq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="LwV-de-CAf"/>
                             <constraint firstItem="vWJ-hX-lKp" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="MOw-18-pLZ"/>
                             <constraint firstAttribute="centerY" secondItem="vWJ-hX-lKp" secondAttribute="centerY" id="QPb-sz-emi"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="r7c-0v-zgc" secondAttribute="bottom" id="a0L-ii-tx8"/>
                             <constraint firstAttribute="centerX" secondItem="vWJ-hX-lKp" secondAttribute="centerX" id="a7u-cX-boA"/>
+                            <constraint firstItem="RT7-5L-jgq" firstAttribute="top" secondItem="2a2-rF-2SP" secondAttribute="bottom" constant="13" id="krQ-xI-Sh6"/>
                             <constraint firstItem="vWJ-hX-lKp" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="sbY-I7-Q3D"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="r7c-0v-zgc" secondAttribute="trailing" constant="-16" id="tE8-Ny-eYQ"/>
+                            <constraint firstItem="2a2-rF-2SP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="vvs-tx-E6R"/>
+                            <constraint firstItem="r7c-0v-zgc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-16" id="weO-IA-Laj"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="FYv-Qw-WSv"/>
                     <connections>
                         <outlet property="map" destination="vWJ-hX-lKp" id="lZa-5n-YiG"/>
                     </connections>
