@@ -13,6 +13,11 @@ extern NSString * const kPartnersURL;
 
 @interface PartnersRequestOperation : NSOperation
 
-- (id)initWithStore:(PartnersStore *)partnersStore;
+- (instancetype)initWithStore:(PartnersStore *)partnersStore;
+- (void)parseReceivedData:(NSData *)data;
+
+@property (strong) NSError *error;
+@property (nonatomic, readonly) NSURL *requestURL;
+@property (nonatomic, readonly) NSManagedObjectContext *context;
 
 @end

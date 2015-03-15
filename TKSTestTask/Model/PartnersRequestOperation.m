@@ -11,11 +11,9 @@
 
 NSString * const kPartnersURL = @"https://api.tcsbank.ru/v1/deposition_partners?accountType=Credit";
 
-@interface PartnersRequestOperation()<NSURLSessionDataDelegate>
+@interface PartnersRequestOperation()
 @property (nonatomic, strong) PartnersStore *partnersStore;
 @property (nonatomic, strong) NSManagedObjectContext* workingContext;
-@property (nonatomic, strong) NSMutableData *receivedData;
-@property (nonatomic, strong) NSOperationQueue *currentQueue;
 @end
 
 @implementation PartnersRequestOperation
@@ -23,89 +21,142 @@ NSString * const kPartnersURL = @"https://api.tcsbank.ru/v1/deposition_partners?
 - (id)initWithStore:(PartnersStore *)partnersStore {
   if (self = [super init]) {
     self.partnersStore = partnersStore;
-    self.receivedData = [[NSMutableData alloc] init];
     self.name = @"Partners Request Operation";
   }
   return self;
 }
 
+- (NSURL *)requestURL {
+  return [NSURL URLWithString:kPartnersURL];
+}
+
+- (NSURL *)imageURL {
+  return [NSURL URLWithString:@"https://static.tcsbank.ru/icons/deposition-partners-v3/logos/contact.png"];
+}
+
+- (NSManagedObjectContext *)context {
+  return self.workingContext;
+}
+
 - (void)main {
-  [self request];
+  @autoreleasepool {
+    self.workingContext = [self.partnersStore createPrivateContext];
+    self.workingContext.undoManager = nil;
+    __weak typeof(self) weakSelf = self;
+    [self.workingContext performBlockAndWait:^{
+      [weakSelf request];
+    }];
+  }
 }
 
 - (void)request {
   if (self.isCancelled) {
     return;
   }
-  self.currentQueue = [NSOperationQueue currentQueue];
-  NSURL *url = [NSURL URLWithString:kPartnersURL];
-  NSURLRequest *request = [NSURLRequest requestWithURL:url];
-  NSURLSession *session =
-    [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-      delegate:self
-      delegateQueue:self.currentQueue];
-  
-  NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
-  [task resume];
+  NSURLRequest *request =
+    [NSURLRequest requestWithURL:self.requestURL
+      cachePolicy:NSURLRequestReturnCacheDataElseLoad
+      timeoutInterval:30];
+  NSURLResponse *resp;
+  NSError *requestError = nil;
+  NSData *data =
+    [NSURLConnection sendSynchronousRequest:request returningResponse:&resp error:&requestError];
+  if (requestError != nil) {
+    NSLog(@"Error while request: %@", requestError.localizedDescription);
+    self.error = requestError;
+    return;
+  }
+  [self parseReceivedData:data];
+  [self save];
 }
 
-- (void)createPartners {
-  self.workingContext = [self.partnersStore createPrivateContext];
-  self.workingContext.undoManager = nil;
+- (NSDate *)imageLastModifiedDate {
+  NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.imageURL];
   
-  __weak typeof(self) weakSelf = self;
-  [self.workingContext performBlockAndWait:^{
-    NSError *error = nil;
-    NSError *saveError = nil;
-    NSArray *raw =
-    [NSJSONSerialization JSONObjectWithData:weakSelf.receivedData
-                                    options:NSJSONReadingAllowFragments
-                                      error:&error][@"payload"];
+  request.HTTPMethod = @"HEAD";
+  NSHTTPURLResponse *response = nil;
+  NSError *error = nil;
+  
+  [NSURLConnection sendSynchronousRequest:request
+    returningResponse:&response
+    error:&error];
+  
+  if (error) {
+    NSLog(@"Error: %@", error.localizedDescription);
+    return nil;
+  } else if ([response respondsToSelector:@selector(allHeaderFields)]) {
+    NSDictionary *headerFields = [response allHeaderFields];
+    NSString *lastModification = [headerFields objectForKey:@"Last-Modified"];
     
-    if (error != nil || raw == nil) {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"EEE, dd MMM yyyy HH:mm:ss zzz"];
+    
+    return [formatter dateFromString:lastModification];
+  }
+  
+  return nil;
+}
+
+- (NSData *)imageData {
+  NSDate *lastModificationDate =
+    [[NSUserDefaults standardUserDefaults] objectForKey:@"LastModifiedKey"];
+  if (lastModificationDate == nil ||
+      [lastModificationDate compare:[self imageLastModifiedDate]] == NSOrderedAscending ||
+      [[NSUserDefaults standardUserDefaults] dataForKey:@"PartnerImageData"] == nil) {
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.imageURL];
+    
+    NSHTTPURLResponse *response = nil;
+    NSError *error = nil;
+    
+    NSData *data = [NSURLConnection sendSynchronousRequest:request
+                          returningResponse:&response
+                                      error:&error];
+    [[NSUserDefaults standardUserDefaults] setObject:data forKey:@"PartnerImageData"];
+    return data;
+  } else {
+    return [[NSUserDefaults standardUserDefaults] dataForKey:@"PartnerImageData"];
+  }
+}
+
+- (void)parseReceivedData:(NSData *)data {
+  NSError *error = nil;
+  NSArray *raw =
+    [NSJSONSerialization JSONObjectWithData:data
+                                  options:NSJSONReadingAllowFragments
+                                    error:&error][@"payload"];
+  
+  if (error != nil || raw == nil || self.isCancelled) {
+    return;
+  }
+  
+  for (NSDictionary *p in raw) {
+    if (self.isCancelled) {
       return;
     }
     
-    for (NSDictionary *p in raw) {
-      if (weakSelf.isCancelled) {
-        break;
-      }
-      
-      if (p[@"id"] == nil || p[@"name"] == nil) {
-        continue;
-      }
-      
-      [Partner createOrUpdatePartnerFrom:p inContext:weakSelf.workingContext];
-      [weakSelf.workingContext save:&saveError];
+    if (p[@"id"] == nil || p[@"name"] == nil) {
+      continue;
     }
-    [weakSelf.workingContext save:&saveError];
-  }];
-}
-
-#pragma mark - NSURLSessionTaskDelegate impl
-
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
-    didCompleteWithError:(NSError *)error {
-  if (self.isCancelled) {
-    self.receivedData = nil;
-    return;
-  }
-  
-  if (self.receivedData.length > 0) {
-    [self createPartners];
+    
+    Partner *partner = [Partner createOrUpdatePartnerFrom:p inContext:self.workingContext];
+    partner.pictureData = [self imageData];
   }
 }
 
-#pragma mark - NSURLSessionDataDelegate impl
-
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
-    didReceiveData:(NSData *)data {
+- (void)save {
   if (self.isCancelled) {
-    [dataTask cancel];
-    return;
+    [self.context rollback];
+  } else {
+    NSLog(@"%@", self.requestURL);
+    [self.context performBlock:^{
+      NSError *saveError = nil;
+      [self.context save:&saveError];
+      if (saveError != nil) {
+        NSLog(@"Error while save context: %@", saveError.localizedDescription);
+        [self.context rollback];
+      }
+    }];
   }
-  
-  [self.receivedData appendData:data];
 }
 
 @end

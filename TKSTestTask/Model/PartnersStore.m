@@ -8,7 +8,9 @@
 
 #import "PartnersStore.h"
 
-@interface PartnersStore()
+@interface PartnersStore() {
+  id _saveNotification;
+}
 @property (nonatomic,strong,readwrite) NSManagedObjectContext* mainManagedObjectContext;
 @property (nonatomic,strong) NSManagedObjectModel* managedObjectModel;
 @property (nonatomic,strong) NSPersistentStoreCoordinator* persistentStoreCoordinator;
@@ -17,31 +19,51 @@
 
 @implementation PartnersStore
 
-- (id)init {
-  self = [super init];
-  if (self) {
-    __weak typeof(self) weakSelf = self;
-    [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification
-      object:nil
-      queue:nil
-      usingBlock:^(NSNotification* note) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (!strongSelf) {
-          return;
-        }
-        NSManagedObjectContext *moc = strongSelf.mainManagedObjectContext;
-        if (note.object != moc) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-            [moc mergeChangesFromContextDidSaveNotification:note];
-          });
-        }
-      }];
-  }
-  
-  return self;
++ (instancetype) sharedInstance {
+  static dispatch_once_t pred;
+  static id shared = nil;
+  dispatch_once(&pred, ^{
+    shared = [[super alloc] createStore];
+    [shared subscribeOnSaveNotification];
+  });
+  return shared;
 }
 
-- (NSManagedObjectContext*)createPrivateContext {
+- (void)dealloc {
+  [self unsubscribeFromSaveNotification];
+}
+
+- (instancetype)createStore {
+  return [super init];
+}
+
+- (void)subscribeOnSaveNotification {
+  __weak typeof(self) weakSelf = self;
+  _saveNotification = [[NSNotificationCenter defaultCenter]
+    addObserverForName:NSManagedObjectContextDidSaveNotification
+    object:nil
+    queue:nil
+    usingBlock:^(NSNotification* note) {
+      __strong typeof(weakSelf) strongSelf = weakSelf;
+      if (!strongSelf) {
+        return;
+      }
+      NSManagedObjectContext *moc = strongSelf.mainManagedObjectContext;
+      if (note.object != moc) {
+        [moc performBlock:^{
+          [moc mergeChangesFromContextDidSaveNotification:note];
+        }];
+      }
+    }];
+}
+
+- (void)unsubscribeFromSaveNotification {
+  if (_saveNotification != nil) {
+    [[NSNotificationCenter defaultCenter] removeObserver:_saveNotification];
+  }
+}
+
+- (NSManagedObjectContext *)createPrivateContext {
   NSManagedObjectContext* context =
     [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
   context.persistentStoreCoordinator = self.persistentStoreCoordinator;
@@ -94,7 +116,6 @@
   return _persistentStoreCoordinator;
 }
 
-
 - (NSManagedObjectContext *)mainManagedObjectContext {
   // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
   if (_mainManagedObjectContext != nil) {
@@ -105,7 +126,7 @@
   if (!coordinator) {
     return nil;
   }
-  _mainManagedObjectContext = [[NSManagedObjectContext alloc] init];
+  _mainManagedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
   [_mainManagedObjectContext setPersistentStoreCoordinator:coordinator];
   return _mainManagedObjectContext;
 }

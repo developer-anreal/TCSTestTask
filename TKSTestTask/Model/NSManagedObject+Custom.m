@@ -7,6 +7,7 @@
 //
 
 #import "NSManagedObject+Custom.h"
+#import "PartnersStore.h"
 
 @implementation NSManagedObject (Custom)
 
@@ -23,6 +24,15 @@
   }
   
   return nil;
+}
+
+- (NSString *)objectIDStringRepresentation {
+  return self.objectID.URIRepresentation.absoluteString;
+}
+
++ (NSManagedObjectID *)managedObjectIDFromString:(NSString *)stringRepresentation {
+  return [[PartnersStore sharedInstance].persistentStoreCoordinator
+    managedObjectIDForURIRepresentation:[NSURL URLWithString:stringRepresentation]];
 }
 
 @end

@@ -9,81 +9,263 @@
 #import "PartnersViewController.h"
 #import "PartnersRequest.h"
 #import "PartnersRequestOperation.h"
+#import "SpotsRequestOperation.h"
+#import "PartnerSpot.h"
+#import "Partner+Addition.h"
+#import "NSManagedObject+Custom.h"
 #import <MapKit/MapKit.h>
 
-@interface PartnerAnnotation: NSObject<MKAnnotation> {
+@interface SpotAnnotation: NSObject<MKAnnotation> {
   CLLocationCoordinate2D _coordinate;
+  NSString *_info;
+  NSString *_workHours;
+  NSString *_address;
+  NSString *_name;
+  NSString *_id;
 }
 @property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
 - (instancetype)initWithCoordinate:(CLLocationCoordinate2D)coordinate;
+- (instancetype)initWithSpot:(PartnerSpot *)spot;
+@property (readonly) NSString *spotId;
+@property (nonatomic, copy) NSString *title;
+@property (nonatomic, strong) UIImage *image;
 @end
 
-@implementation PartnerAnnotation
+@implementation SpotAnnotation
+
 - (instancetype)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
   if (self = [super init]) {
     _coordinate = coordinate;
   }
   return self;
 }
+
+- (instancetype)initWithSpot:(PartnerSpot *)spot {
+  if (self = [self initWithCoordinate:
+              CLLocationCoordinate2DMake(spot.latitude.floatValue, spot.longitude.floatValue)]) {
+    _name = [spot.partner.name copy];
+    _info = [spot.addressInfo copy];
+    _workHours = [spot.workHours copy];
+    _address = [spot.addressInfo copy];
+    _id = spot.objectIDStringRepresentation;
+    if (spot.partner.image != nil) {
+      _image = spot.partner.image;
+    }
+    _title = [NSString stringWithFormat:@"%@\n%@", _name, _address];
+  }
+  
+  return self;
+}
+
+- (NSString *)spotId {
+  return _id;
+}
+
 @end
 
-@interface PartnersViewController () <MKMapViewDelegate>
+@interface PartnersViewController ()
+  <MKMapViewDelegate, CLLocationManagerDelegate, NSFetchedResultsControllerDelegate>
+
 @property (weak) IBOutlet MKMapView *map;
-@property (nonatomic, strong) NSOperationQueue *operationQueue;
-@property (nonatomic, strong) PartnersStore *partnersStore;
-@property (strong) NSArray *partnerAnnotations;
+@property (nonatomic, strong, readonly) NSFetchedResultsController *spots;
 @end
 
-@implementation PartnersViewController
+@implementation PartnersViewController {
+  PartnersStore *_partnersStore;
+  NSOperationQueue *_operationQueue;
+  CLLocationManager *_locationManager;
+  PartnersRequestOperation *_loadPartnersOperation;
+  SpotsRequestOperation *_loadSpotsOperation;
+  NSFetchedResultsController *_spots;
+  NSMutableDictionary *_displayedAnnotations;
+}
+
+- (NSFetchedResultsController *)spots {
+  if (_spots != nil) {
+    return _spots;
+  }
+  
+  NSString *predicateFormat = @"(latitude BETWEEN {%f, %f}) AND (longitude BETWEEN {%f, %f})";
+  CLLocationCoordinate2D center = self.map.region.center;
+  MKCoordinateSpan span = self.map.region.span;
+  float minLat = center.latitude - span.latitudeDelta / 2.f;
+  float maxLat = center.latitude + span.latitudeDelta / 2.f;
+  float minLng = center.longitude - span.longitudeDelta / 2.f;
+  float maxLng = center.longitude + span.longitudeDelta / 2.f;
+  NSFetchRequest *spotsRequest = [[NSFetchRequest alloc] initWithEntityName:@"PartnerSpot"];
+  spotsRequest.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"latitude" ascending:YES]];
+  spotsRequest.predicate =
+    [NSPredicate predicateWithFormat:predicateFormat, minLat, maxLat, minLng, maxLng];
+
+  _spots =
+    [[NSFetchedResultsController alloc] initWithFetchRequest:spotsRequest
+      managedObjectContext:_partnersStore.mainManagedObjectContext
+      sectionNameKeyPath:nil cacheName:nil];
+  _spots.delegate = self;
+  
+  return _spots;
+}
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  self.partnersStore = [[PartnersStore alloc] init];
-  self.operationQueue = [[NSOperationQueue alloc] init];
-  PartnersRequestOperation *op = [[PartnersRequestOperation alloc] initWithStore:self.partnersStore];
-  op.completionBlock = ^{
-    NSLog(@"Requested");
-  };
-  [self.operationQueue addOperation:op];
-//  PartnersRequest *pr = [[PartnersRequest alloc] init];
-//  __weak typeof(self) weakSelf = self;
-//  [pr loadSpotsAtPoint:CLLocationCoordinate2DMake(55.755786, 37.617633) radius:1000 completion:^(id o) {
-//    __strong typeof(weakSelf) strongSelf = weakSelf;
-//    if (!strongSelf) {
-//      return;
-//    }
-//    
-//    [strongSelf.map removeAnnotations:strongSelf.partnerAnnotations];
-//    
-//    assert([o isKindOfClass:[NSArray class]]);
-//    NSMutableArray *res = [NSMutableArray array];
-//    for (NSDictionary *p in o) {
-//      assert(p[@"location"] != nil);
-//      assert([p[@"location"] isKindOfClass:[NSDictionary class]]);
-//      assert(p[@"location"][@"latitude"] != nil);
-//      assert(p[@"location"][@"longitude"] != nil);
-//      NSDictionary *locationDict = p[@"location"];
-//      
-//      CGFloat lat = [locationDict[@"latitude"] floatValue];
-//      CGFloat lng = [locationDict[@"longitude"] floatValue];
-//      
-//      PartnerAnnotation *annotation = [[PartnerAnnotation alloc] initWithCoordinate:CLLocationCoordinate2DMake(lat, lng)];
-//      [res addObject:annotation];
-//      
-//      [strongSelf.map addAnnotation:annotation];
-//    }
-//  }];
   
+  _displayedAnnotations = [NSMutableDictionary dictionary];
+  
+  _partnersStore = [PartnersStore sharedInstance];
+  
+  _operationQueue = [[NSOperationQueue alloc] init];
+  
+  _loadPartnersOperation =
+    [[PartnersRequestOperation alloc] initWithStore:_partnersStore];
+  [_operationQueue addOperation:_loadPartnersOperation];
+  
+  _locationManager = [[CLLocationManager alloc] init];
+  _locationManager.delegate = self;
+  if ([_locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+    [_locationManager requestWhenInUseAuthorization];
+  }
+}
+
+- (void)reloadFetchRequest {
+  _spots = nil;
+  NSError *fetchError = nil;
+  [self.spots performFetch:&fetchError];
+  if (fetchError == nil) {
+    for (PartnerSpot *spot in self.spots.fetchedObjects) {
+      [self addAnnotationForPartnerSpot:spot];
+    }
+  } else {
+    NSLog(@"%@", fetchError.localizedDescription);
+  }
+}
+
+- (void)setupMap {
+  MKCoordinateRegion region =
+    MKCoordinateRegionMakeWithDistance(_locationManager.location.coordinate, 300, 300);
+  self.map.region = [self.map regionThatFits:region];
+}
+
+- (void)addAnnotationForPartnerSpot:(PartnerSpot *)spot {
+  dispatch_queue_t background = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+  dispatch_sync(background, ^{
+    if (_displayedAnnotations[spot.objectIDStringRepresentation] == nil) {
+      SpotAnnotation *annotation = [[SpotAnnotation alloc] initWithSpot:spot];
+      _displayedAnnotations[spot.objectIDStringRepresentation] = spot;
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self.map addAnnotation:annotation];
+      });
+    }
+  });
+}
+
+- (void)removeAnnotationForPartnerSpot:(PartnerSpot *)spot {
+  if (_displayedAnnotations[spot.objectIDStringRepresentation] != nil) {
+    [self.map removeAnnotation:_displayedAnnotations[spot.objectIDStringRepresentation]];
+  }
+}
+
+- (void)loadSpots {
+  if (_loadSpotsOperation.executing || _loadSpotsOperation.ready) {
+    [_loadSpotsOperation cancel];
+  }
+  CLLocationCoordinate2D coordinate = self.map.region.center;
+  double radius = self.map.visibleMapRect.size.height / 2.;
+  
+  _loadSpotsOperation =
+    [[SpotsRequestOperation alloc]
+      initWithCoordinate:CLLocationCoordinate2DMake(coordinate.latitude, coordinate.longitude)
+      radius:radius
+      store:_partnersStore];
+  
+  if (_loadPartnersOperation.executing || _loadPartnersOperation.ready) {
+    [_loadSpotsOperation addDependency:_loadPartnersOperation];
+  }
+  [_operationQueue addOperation:_loadSpotsOperation];
+}
+
+- (void)removeInvisibleAnnotations {
+  NSSet *visibleAnnotations = [self.map annotationsInMapRect:self.map.visibleMapRect];
+  NSMutableSet *allAnnotations =
+    [NSMutableSet setWithSet:[self.map annotationsInMapRect:MKMapRectWorld]];
+  [allAnnotations minusSet:visibleAnnotations];
+  dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+    for (id<MKAnnotation> a in allAnnotations.allObjects) {
+      if ([a isKindOfClass:[SpotAnnotation class]]) {
+        [_displayedAnnotations removeObjectForKey:((SpotAnnotation *)a).spotId];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.map removeAnnotations:allAnnotations.allObjects];
+        });
+      }
+    }
+  });
 }
 
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
 }
 
+#pragma mark - MKMapViewDelegate impl
+
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id)annotation {
-  MKPinAnnotationView *pin =
-    [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"pin"];
-  return pin;
+  if ([annotation isKindOfClass:[SpotAnnotation class]]) {
+    static NSString *spotAnnotationViewId = @"pinId";
+    MKAnnotationView *spotView;
+    spotView = [mapView dequeueReusableAnnotationViewWithIdentifier:spotAnnotationViewId];
+    
+    if (spotView == nil) {
+      spotView = [[MKAnnotationView alloc] initWithAnnotation:annotation
+                                              reuseIdentifier:spotAnnotationViewId];
+    }
+    
+    spotView.canShowCallout = YES;
+    spotView.image = ((SpotAnnotation *)annotation).image;
+    spotView.frame = CGRectMake(0, 0, 30, 30);
+    
+    return spotView;
+  }
+  return nil;
+}
+
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
+  [_loadSpotsOperation cancel];
+}
+
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+  CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+  if (status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse) {
+    [self reloadFetchRequest];
+    [self loadSpots];
+    [self removeInvisibleAnnotations];
+  }
+}
+
+#pragma mark - CLLocationManagerDelegate impl
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+  if (status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse) {
+    [manager startUpdatingLocation];
+    [self setupMap];
+  } else if (status == kCLAuthorizationStatusDenied || status == kCLAuthorizationStatusRestricted) {
+
+  }
+}
+
+#pragma mark NSFetchedResultsControllerDelegate impl
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
+  switch (type) {
+    
+    case NSFetchedResultsChangeInsert:
+      [self addAnnotationForPartnerSpot:anObject];
+      break;
+      
+    case NSFetchedResultsChangeDelete:
+      [self removeAnnotationForPartnerSpot:anObject];
+      break;
+      
+    default:
+      break;
+  }
 }
 
 @end

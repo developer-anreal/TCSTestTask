@@ -9,11 +9,20 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-@interface PartnersStore : NSOperation
+@interface PartnersStore : NSObject
 
-@property (nonatomic,strong,readonly) NSManagedObjectContext *mainManagedObjectContext;
++ (instancetype)sharedInstance;
+
++ (instancetype)alloc __attribute__((unavailable("alloc not available, call sharedInstance instead")));
+- (instancetype)init __attribute__((unavailable("init not available, call sharedInstance instead")));
++ (instancetype)new __attribute__((unavailable("new not available, call sharedInstance instead")));
 
 - (void)saveContext;
 - (NSManagedObjectContext *)createPrivateContext;
+
+@property (nonatomic, strong, readonly) NSManagedObjectContext *mainManagedObjectContext;
+@property (nonatomic, strong, readonly) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+@property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong, readonly) NSURL *applicationDocumentsDirectory;
 
 @end

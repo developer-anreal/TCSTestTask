@@ -2,7 +2,7 @@
 //  Partner.h
 //  TKSTestTask
 //
-//  Created by Anton Serov on 13/03/15.
+//  Created by Anton Serov on 3/15/15.
 //  Copyright (c) 2015 hexforge. All rights reserved.
 //
 
@@ -18,7 +18,7 @@
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * partnerDescription;
 @property (nonatomic, retain) NSString * partnerId;
-@property (nonatomic, retain) NSData * picture;
+@property (nonatomic, retain) NSData * pictureData;
 @property (nonatomic, retain) NSString * url;
 @property (nonatomic, retain) PointType *pointType;
 @property (nonatomic, retain) NSSet *spots;

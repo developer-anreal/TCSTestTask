@@ -7,10 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "Partner.h"
 
 @interface Partner (Creation)
 
 + (Partner *)createOrUpdatePartnerFrom:(NSDictionary *)dict inContext:(NSManagedObjectContext *)context;
+
+@end
+
+@interface Partner (Image)
+
+@property (nonatomic, readonly) UIImage *image;
 
 @end

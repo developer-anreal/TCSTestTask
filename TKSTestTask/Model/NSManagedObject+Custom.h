@@ -11,6 +11,9 @@
 
 @interface NSManagedObject (Custom)
 
+@property (nonatomic, copy, readonly) NSString *objectIDStringRepresentation;
+
 + (instancetype)firstObjectWithPredicate:(NSPredicate *)predicate inContext:(NSManagedObjectContext *)context;
++ (NSManagedObjectID *)managedObjectIDFromString:(NSString *)stringRepresentation;
 
 @end

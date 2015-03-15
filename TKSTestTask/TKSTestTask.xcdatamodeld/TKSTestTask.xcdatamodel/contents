@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6254" systemVersion="14C109" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C1510" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Partner" representedClassName="Partner" syncable="YES">
         <attribute name="moneyMax" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="moneyMin" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="name" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="partnerDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="partnerId" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="picture" optional="YES" transient="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="pictureData" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="pointType" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PointType" inverseName="spot" inverseEntity="PointType" syncable="YES"/>
         <relationship name="spots" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PartnerSpot" inverseName="partner" inverseEntity="PartnerSpot" syncable="YES"/>
@@ -16,7 +16,6 @@
         <attribute name="fullAddress" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latitude" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="partnerName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="phones" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="workHours" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="partner" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Partner" inverseName="spots" inverseEntity="Partner" syncable="YES"/>
@@ -27,7 +26,7 @@
     </entity>
     <elements>
         <element name="Partner" positionX="-63" positionY="36" width="128" height="180"/>
-        <element name="PartnerSpot" positionX="-63" positionY="-18" width="128" height="163"/>
+        <element name="PartnerSpot" positionX="-63" positionY="-18" width="128" height="150"/>
         <element name="PointType" positionX="-54" positionY="45" width="128" height="73"/>
     </elements>
 </model>
