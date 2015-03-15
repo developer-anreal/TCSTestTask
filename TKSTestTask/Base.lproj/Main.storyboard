@@ -41,7 +41,7 @@
                                 </connections>
                             </mapView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="r7c-0v-zgc">
-                                <rect key="frame" x="0.0" y="570" width="600" height="30"/>
+                                <rect key="frame" x="0.0" y="600" width="600" height="30"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading spots..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4gm-Qm-hfH">
                                         <rect key="frame" x="238" y="4" width="124" height="20.5"/>
@@ -88,7 +88,7 @@
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="vWJ-hX-lKp" secondAttribute="centerX" id="6hu-kJ-ZWN"/>
                             <constraint firstItem="RT7-5L-jgq" firstAttribute="top" secondItem="2a2-rF-2SP" secondAttribute="bottom" constant="10" id="BAs-5B-r6V"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="r7c-0v-zgc" secondAttribute="bottom" id="HkT-5r-M3H"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="r7c-0v-zgc" secondAttribute="bottom" constant="-30" id="HkT-5r-M3H"/>
                             <constraint firstItem="vWJ-hX-lKp" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="Ip5-b1-AAS"/>
                             <constraint firstAttribute="centerY" secondItem="vWJ-hX-lKp" secondAttribute="centerY" id="MvJ-Kx-zly"/>
                             <constraint firstItem="r7c-0v-zgc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-16" id="Uu3-ZS-9gQ"/>
