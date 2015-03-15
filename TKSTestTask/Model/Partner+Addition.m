@@ -57,7 +57,7 @@
 @implementation Partner (Image)
 
 - (UIImage *)image {
-  return [UIImage imageWithData:self.pictureData];
+  return [UIImage imageWithData:[[NSUserDefaults standardUserDefaults] dataForKey:@"PartnerImageData"]];
 }
 
 @end

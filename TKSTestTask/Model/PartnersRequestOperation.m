@@ -111,7 +111,14 @@ NSString * const kPartnersURL = @"https://api.tcsbank.ru/v1/deposition_partners?
     NSData *data = [NSURLConnection sendSynchronousRequest:request
                           returningResponse:&response
                                       error:&error];
-    [[NSUserDefaults standardUserDefaults] setObject:data forKey:@"PartnerImageData"];
+    CGSize newSize = CGSizeMake(30, 30);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    UIImage *image = [UIImage imageWithData:data];
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    [[NSUserDefaults standardUserDefaults] setObject:UIImagePNGRepresentation(newImage) forKey:@"PartnerImageData"];
+    
     return data;
   } else {
     return [[NSUserDefaults standardUserDefaults] dataForKey:@"PartnerImageData"];

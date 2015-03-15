@@ -28,6 +28,7 @@
 - (instancetype)initWithSpot:(PartnerSpot *)spot;
 @property (readonly) NSString *spotId;
 @property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *subtitle;
 @property (nonatomic, strong) UIImage *image;
 @end
 
@@ -46,12 +47,13 @@
     _name = [spot.partner.name copy];
     _info = [spot.addressInfo copy];
     _workHours = [spot.workHours copy];
-    _address = [spot.addressInfo copy];
+    _address = [spot.fullAddress copy];
     _id = spot.objectIDStringRepresentation;
     if (spot.partner.image != nil) {
       _image = spot.partner.image;
     }
-    _title = [NSString stringWithFormat:@"%@\n%@", _name, _address];
+    _title = _name;
+    _subtitle = [NSString stringWithFormat:@"%@, %@", _address, _workHours];
   }
   
   return self;
@@ -67,6 +69,7 @@
   <MKMapViewDelegate, CLLocationManagerDelegate, NSFetchedResultsControllerDelegate>
 
 @property (weak) IBOutlet MKMapView *map;
+@property (weak) IBOutlet UIView *searchInfoView;
 @property (nonatomic, strong, readonly) NSFetchedResultsController *spots;
 @end
 
@@ -110,7 +113,16 @@
   [super viewDidLoad];
   
   self.navigationItem.leftBarButtonItem =
-    [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.map];;
+    [[MKUserTrackingBarButtonItem alloc] initWithMapView:self.map];
+  
+  CGRect rect = self.searchInfoView.frame;
+  self.searchInfoView.frame =
+    CGRectMake(
+      CGRectGetMinX(rect),
+      CGRectGetMinY(rect) + CGRectGetHeight(rect),
+      CGRectGetWidth(rect),
+      CGRectGetHeight(rect)
+  );
   
   _displayedAnnotations = [NSMutableDictionary dictionary];
   
@@ -201,6 +213,33 @@
   if (_loadPartnersOperation.executing || _loadPartnersOperation.ready) {
     [_loadSpotsOperation addDependency:_loadPartnersOperation];
   }
+  __weak typeof(self) weakSelf = self;
+  _loadSpotsOperation.completionBlock = ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [UIView animateWithDuration:0.3f animations:^{
+        CGRect rect = weakSelf.searchInfoView.frame;
+        weakSelf.searchInfoView.frame =
+          CGRectMake(
+            CGRectGetMinX(rect),
+            CGRectGetMinY(rect) + CGRectGetHeight(rect),
+            CGRectGetWidth(rect),
+            CGRectGetHeight(rect)
+          );
+      } completion:^(BOOL finished) {
+      }];
+    });
+  };
+  [UIView animateWithDuration:0.3f animations:^{
+    CGRect rect = weakSelf.searchInfoView.frame;
+    weakSelf.searchInfoView.frame =
+    CGRectMake(
+      CGRectGetMinX(rect),
+      CGRectGetMinY(rect) - CGRectGetHeight(rect),
+      CGRectGetWidth(rect),
+      CGRectGetHeight(rect)
+    );
+  } completion:^(BOOL finished) {
+  }];
   [_operationQueue addOperation:_loadSpotsOperation];
 }
 
